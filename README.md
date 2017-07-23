@@ -17,4 +17,8 @@ boot
 ```
 
 # After iPXE boot
-rancheros-cloud-config.yml will be stored in /var/lib/rancher/conf/cloud-config.d/ as boot.yml. 
+rancheros-cloud-config.yml will be stored in /var/lib/rancher/conf/cloud-config.d/ as boot.yml.
+
+Create partition on /dev/vda (this will wipe everything from disk /dev/vda):
+
+`sudo parted -s -a optimal /dev/vda mklabel gpt; sudo parted -s -a optimal /dev/vda unit s mkpart primary 0% 100%`
