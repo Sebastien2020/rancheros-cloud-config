@@ -15,3 +15,6 @@ initrd ${base-url}/initrd
 
 boot
 ```
+
+# After iPXE boot
+rancheros-cloud-config.yml will be stored in /var/lib/rancher/conf/cloud-config.d/ as boot.yml. 
