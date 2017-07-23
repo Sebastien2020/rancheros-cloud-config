@@ -41,11 +41,14 @@ write_files:
       restrict 127.0.0.1
       restrict [::1]
 mounts:
-  - [ vdb, /var/lib/docker, "ext4", "" ]
+  - [ /dev/vdb1, /var/lib/docker, "ext4", "" ]
 rancher:
   state:
-    fstype: auto
-    dev: LABEL=RANCHER_STATE
+    dev: /dev/vda1
+    fstype: ext4
+    autoformat:
+      - /dev/vda
+      - /dev/vdb
   services_include:
     centos-console: true
   network:
