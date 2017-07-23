@@ -1,7 +1,7 @@
 # RancherOS cloud-config
-rancheros-cloud-config.yml
+rancheros-cloud-config.yml for RancherOS iPXE boot
 
-# Use in conjunction with PXE boot script
+# Use in conjunction with iPXE boot script
 ```
 #!ipxe
 # Boots RancherOS in Ramdisk with persistent storage on disk /dev/vda
@@ -9,7 +9,7 @@ rancheros-cloud-config.yml
 # Location of Kernel/Initrd images
 set base-url http://releases.rancher.com/os/latest
 
-kernel ${base-url}/vmlinuz rancher.state.dev=LABEL=RANCHER_STATE rancher.state.autoformat=[/dev/vda] rancher.cloud_init.datasources=[url:https://raw.githubusercontent.com/sanderdewitte/rancheros-cloud-config/master/rancheros-cloud-config.yml]
+kernel ${base-url}/vmlinuz -- rancher.cloud_init.datasources=[url:https://raw.githubusercontent.com/sanderdewitte/rancheros-cloud-config/master/rancheros-cloud-config.yml]
 
 initrd ${base-url}/initrd
 
