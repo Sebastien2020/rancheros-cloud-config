@@ -21,8 +21,6 @@ rancher:
   state:
     dev: LABEL=RANCHER_STATE
     fstype: auto
-    autoformat:
-      - /dev/vda
   services_include:
     centos-console: true
   network:
