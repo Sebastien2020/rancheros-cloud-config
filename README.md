@@ -19,6 +19,6 @@ boot
 # After iPXE boot
 rancheros-cloud-config.yml will be stored in /var/lib/rancher/conf/cloud-config.d/ as boot.yml.
 
-Create partition on /dev/vda (this will wipe everything from disk /dev/vda):
+Install RancherOS to disk /dev/vda (this will wipe everything from disk /dev/vda if there is any data!):
 
-`sudo parted -s -a optimal /dev/vda mklabel gpt; sudo parted -s -a optimal /dev/vda unit s mkpart primary 0% 100%`
+`sudo ros install -t generic -c /var/lib/rancher/conf/cloud-config.d/boot.yml -d /dev/vda`
