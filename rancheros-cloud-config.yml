@@ -32,7 +32,3 @@ rancher:
     interfaces:
       eth0:
         dhcp: true
-      eth1:
-        address: 172.16.1.100/12
-        gateway: 172.16.1.1
-        dhcp: false
