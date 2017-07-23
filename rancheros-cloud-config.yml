@@ -17,15 +17,12 @@ write_files:
       restrict default nomodify nopeer noquery limited kod
       restrict 127.0.0.1
       restrict [::1]
-mounts:
-  - [ /dev/vdb1, /var/lib/docker, "ext4", "" ]
 rancher:
   state:
-    dev: /dev/vda1
-    fstype: ext4
+    dev: LABEL=RANCHER_STATE
+    fstype: auto
     autoformat:
       - /dev/vda
-      - /dev/vdb
   services_include:
     centos-console: true
   network:
