@@ -1,5 +1,5 @@
 # RancherOS cloud-config
-ranceros-cloud-config.yml
+rancheros-cloud-config.yml
 
 # Use in conjunction with PXE boot script
 ```
