@@ -4,7 +4,7 @@ rancheros-cloud-config.yml for RancherOS iPXE boot
 # Use in conjunction with iPXE boot script
 ```
 #!ipxe
-# Boots RancherOS in Ramdisk with persistent storage on disk /dev/vda
+# Boots RancherOS in Ramdisk
 
 # Location of Kernel/Initrd images
 set base-url http://releases.rancher.com/os/latest
