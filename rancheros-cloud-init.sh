@@ -55,5 +55,5 @@ rancher:
     centos-console: true
 EOF
 
-sudo ros install --no-reboot -f -c cloud-config.yml -d /dev/vda
+sudo ros install --no-reboot -f -t generic -c cloud-config.yml -d /dev/vda
 sudo reboot
