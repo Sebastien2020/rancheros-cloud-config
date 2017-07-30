@@ -9,7 +9,7 @@ rancheros-cloud-config.yml for RancherOS iPXE boot
 # Location of Kernel/Initrd images
 set base-url http://releases.rancher.com/os/latest
 
-kernel ${base-url}/vmlinuz -- rancher.cloud_init.datasources=[url:https://raw.githubusercontent.com/sanderdewitte/rancheros-cloud-config/master/rancheros-cloud-config.yml]
+kernel ${base-url}/vmlinuz rancher.state.formatzero=true -- rancher.cloud_init.datasources=[url:https://raw.githubusercontent.com/sanderdewitte/rancheros-cloud-config/master/rancheros-cloud-config.yml]
 
 initrd ${base-url}/initrd
 
