@@ -1,7 +1,7 @@
 #!/bin/sh
 
-VULTR_SRV_LABEL=<VULTR_SRV_LABEL>
-VULTR_API_KEY=<VULTR_API_KEY>
+VULTR_SRV_LABEL=ams-rancheros-01
+VULTR_API_KEY=C4SKQNOPH5YFTJVHJS65OBZBOFQPH6P5LDSA
 VULTR_API_URL=https://api.vultr.com
 VULTR_API_VER=v1
 VULTR_PVT_IPV4=$(curl -s -H "API-Key: ${VULTR_API_KEY}" -G --data-urlencode "label=${VULTR_SVR_LBL}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -Po "\"internal_ip\":\"\K(?:\d{1,3}\.){3}\d{1,3}")
