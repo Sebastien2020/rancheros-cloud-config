@@ -34,6 +34,7 @@ rancher:
       eth0:
         dhcp: true
       eth1:
+        dhcp: false
         address: ${VULTR_PVT_IPV4}/16
         mtu: 1450
   state:
