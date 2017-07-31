@@ -1,14 +1,14 @@
 #!/bin/sh
 
+VULTR_SRV_LABEL=<VULTR_SERVER_LABEL>
+VULTR_API_KEY=<VULTR_API_KEY>
 VULTR_API_URL=https://api.vultr.com
 VULTR_API_VER=v1
-VULTR_API_KEY=<VULTR_API_KEY>
-VULTR_IP_V4="$(/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}' | xargs echo -n $1)"
-VULTR_HOST=$(curl ${VULTR_API_URL}/${VULTR_API_VER}/server/list?api_key=${VULTR_API_KEY} | jq ".[] | select(.main_ip==\"${VULTR_IP_V4}\") | .label" | xargs echo -n $1)
+VULTR_PVT_IPV4=$(curl -s -H "API-Key: ${VULTR_API_KEY}" -G --data-urlencode "label=${VULTR_SVR_LBL}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -Po "\"internal_ip\":\"\K(?:\d{1,3}\.){3}\d{1,3}")
 
 cat > "cloud-config.yml" <<EOF
 #cloud-config
-hostname: $VULTR_HOST
+hostname: $VULTR_SRV_LABEL
 ssh_authorized_keys:
   - ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAD6hltyl1MpRm6Q2KWr2QwaPGwa2RgGvyQh1u7Fgl+BsHJZiwmjhBMVdwH+CfJ3dD9m2cTnDXqdYJF5qfUl55DOsQHRYaqBywpv3bQ6LF+nJQNKSA0/BJJl2ONUWdQ7LmcUJmD6QtsKEY1JQEvRUtr6KfShokN7hYW0fn47HeolqlKQkA==
 write_files:
@@ -33,6 +33,9 @@ rancher:
     interfaces:
       eth0:
         dhcp: true
+      eth1:
+        address: ${VULTR_PVT_IPV4}/16
+        mtu: 1450
   state:
     dev: LABEL=RANCHER_STATE
     fstype: auto
