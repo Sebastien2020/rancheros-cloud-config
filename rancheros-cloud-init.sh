@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VULTR_SRV_LABEL=ams-rancheros-01
+VULTR_SRV_LABEL=ams-rancheros-02
 VULTR_API_KEY=""
 VULTR_API_URL=https://api.vultr.com
 VULTR_API_VER=v1
