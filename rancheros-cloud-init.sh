@@ -1,9 +1,10 @@
 #!/bin/sh
 
-VULTR_SRV_LABEL=ams-rancheros-02
+VULTR_SRV_LABEL=""
 VULTR_API_KEY=""
 VULTR_API_URL=https://api.vultr.com
 VULTR_API_VER=v1
+VULTR_SVR_CREATION_DATES=$(wget -qO- --header="API-Key: ${VULTR_API_KEY}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -Po "\"date_created\":\"\K\d{4}(?:-\d{2}){2}\s+(?:\d{2}:){2}\d{2}")
 VULTR_PVT_IPV4=$(wget -qO- --header="API-Key: ${VULTR_API_KEY}" --header="Label: ${VULTR_SVR_LBL}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -Po "\"internal_ip\":\"\K(?:\d{1,3}\.){3}\d{1,3}")
 
 cat > "cloud-config.yml" <<EOF
