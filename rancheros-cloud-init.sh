@@ -4,8 +4,8 @@ VULTR_API_KEY=""
 VULTR_API_URL=https://api.vultr.com
 VULTR_API_VER=v1
 
-VULTR_SVR_CREATION_DATETIME_LIST=$(wget -qO- --header="API-Key: ${VULTR_API_KEY}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -Po "\"date_created\":\"\K\d{4}(?:-\d{2}){2}\s+(?:\d{2}:){2}\d{2}")
-VULTR_SVR_CREATION_DATETIMES=($(echo $VULTR_SVR_CREATION_DATETIME_LIST | sed -re 's/(-[0-9]{2})[[:space:]]{1,}([0-9]{2}:)/\1T\2/g'))
+VULTR_SVR_CREATION_DATETIMES_LIST=$(wget -qO- --header="API-Key: ${VULTR_API_KEY}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -Po "\"date_created\":\"\K\d{4}(?:-\d{2}){2}\s+(?:\d{2}:){2}\d{2}")
+VULTR_SVR_CREATION_DATETIMES=($(echo $VULTR_SVR_CREATION_DATETIMES_LIST | sed -re 's/(-[0-9]{2})[[:space:]]{1,}([0-9]{2}:)/\1T\2/g'))
 
 IDX=0
 MAX_IDX=0
