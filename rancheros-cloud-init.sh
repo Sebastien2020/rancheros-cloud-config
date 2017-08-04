@@ -4,7 +4,17 @@ VULTR_API_KEY=""
 VULTR_API_URL=https://api.vultr.com
 VULTR_API_VER=v1
 
-# wget -qO- --header="API-Key: ${VULTR_API_KEY}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -oP '\".*?\":[\"\[].*?[\"\]]' | grep -E "date_created|internal_ip|label" | awk -F'":' '{print $NF}'
+VULTR_SVR_INFO=($(wget -qO- --header="API-Key: ${VULTR_API_KEY}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list \
+                 | grep -oP '\".*?\":[\"\[].*?[\"\]]' \
+                 | grep -E 'SUBID|date_created|internal_ip|label' \
+                 | sed -re '/SUBID/ s/^.*\{//' \
+                 | sed -re '/date_created/ s/(-[0-9]{2})[[:space:]]{1,}([0-9]{2}:)/\1T\2/'))
+
+for VULTR_SVR_ITEM in "${VULTR_SVR_INFO[@]}"; do
+    VULTR_SVR_ITEM_KEY=$(echo "$VULTR_SVR_ITEM" | awk -F':' '{print $1}' | sed -e 's/^"//' -e 's/"$//')
+    VULTR_SVR_ITEM_VALUE=$(echo "$VULTR_SVR_ITEM" | awk -F':' '{print $NF}' | sed -e 's/^"//' -e 's/"$//')
+done
+
 VULTR_SVR_CREATION_DATETIMES_LIST=$(wget -qO- --header="API-Key: ${VULTR_API_KEY}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -Po "\"date_created\":\"\K\d{4}(?:-\d{2}){2}\s+(?:\d{2}:){2}\d{2}")
 VULTR_SVR_CREATION_DATETIMES=($(echo $VULTR_SVR_CREATION_DATETIMES_LIST | sed -re 's/(-[0-9]{2})[[:space:]]{1,}([0-9]{2}:)/\1T\2/g'))
 
