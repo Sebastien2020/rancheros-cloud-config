@@ -28,8 +28,6 @@ for VULTR_SVR_CREATION_DATETIME in ${VULTR_SVR_CREATION_DATETIMES[@]}; do
 done
 LAST_BUILT_VULTR_SVR_CREATION_DATETIME=${VULTR_SVR_CREATION_DATETIMES[$MAX_IDX]/T/ }
 
-SUBID=...
-
 VULTR_PVT_IPV4=$(wget -qO- --header="API-Key: ${VULTR_API_KEY}" --header="Label: ${VULTR_SVR_LBL}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -Po "\"internal_ip\":\"\K(?:\d{1,3}\.){3}\d{1,3}")
 
 cat > "cloud-config.yml" <<EOF
