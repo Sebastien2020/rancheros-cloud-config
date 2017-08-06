@@ -60,6 +60,7 @@ else
   LAST_BUILT_SVR_PVT_IPV4="192.168.99.99"
 fi
 
+# Generate cloud-config
 cat > "cloud-config.yml" <<EOF
 #cloud-config
 hostname: $LAST_BUILT_SRV_LABEL
@@ -100,5 +101,7 @@ rancher:
     centos-console: true
 EOF
 
-sudo ros install --no-reboot -f -t generic -c cloud-config.yml -d /dev/vda
+# Install rancheros to disk using cloud configi, then reboot
+SVR_DISK="/dev/vda"
+sudo ros install --no-reboot -f -t generic -c cloud-config.yml -d $SVR_DISK
 sudo reboot
