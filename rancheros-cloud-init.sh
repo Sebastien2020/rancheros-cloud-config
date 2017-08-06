@@ -7,10 +7,10 @@ API_VER="v1"
 
 # Get metadata from all servers
 SVR_INFO=($(wget -qO- --header="API-Key: ${API_KEY}" ${API_URL}/${API_VER}/server/list \
-            | grep -oP '\".*?\":[\"\[].*?[\"\]]' \
-            | grep -E 'SUBID|date_created|internal_ip|label' \
-            | sed -re '/SUBID/ s/^.*\{//' \
-            | sed -re '/date_created/ s/(-[0-9]{2})[[:space:]]{1,}([0-9]{2}:)/\1T\2/'))
+            | grep -E -o '\"[^\"]+\":\"[^\"]+\"' \
+            | grep -E    'SUBID|date_created|internal_ip|label' \
+            | sed  -E -e '/date_created/ s/-([0-9]{2})/.\1/g' \
+                      -e '/date_created/ s/(\.[0-9]{2})[[:space:]]{1,}([0-9]{2}:)/\1-\2/'))
 
 # Store metadata in separate arrays
 SVR_COUNT=0
