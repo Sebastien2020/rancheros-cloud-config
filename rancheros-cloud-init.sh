@@ -1,40 +1,70 @@
 #!/usr/bin/env bash
 
-VULTR_API_KEY=""
-VULTR_API_URL=https://api.vultr.com
-VULTR_API_VER=v1
+# API information
+API_KEY=""
+API_URL="https://api.vultr.com"
+API_VER="v1"
 
-VULTR_SVR_INFO=($(wget -qO- --header="API-Key: ${VULTR_API_KEY}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list \
-                 | grep -oP '\".*?\":[\"\[].*?[\"\]]' \
-                 | grep -E 'SUBID|date_created|internal_ip|label' \
-                 | sed -re '/SUBID/ s/^.*\{//' \
-                 | sed -re '/date_created/ s/(-[0-9]{2})[[:space:]]{1,}([0-9]{2}:)/\1T\2/'))
+# Get metadata from all servers
+SVR_INFO=($(wget -qO- --header="API-Key: ${API_KEY}" ${API_URL}/${API_VER}/server/list \
+            | grep -oP '\".*?\":[\"\[].*?[\"\]]' \
+            | grep -E 'SUBID|date_created|internal_ip|label' \
+            | sed -re '/SUBID/ s/^.*\{//' \
+            | sed -re '/date_created/ s/(-[0-9]{2})[[:space:]]{1,}([0-9]{2}:)/\1T\2/'))
 
-for VULTR_SVR_ITEM in "${VULTR_SVR_INFO[@]}"; do
-    VULTR_SVR_ITEM_KEY=$(echo "$VULTR_SVR_ITEM" | awk -F':' '{print $1}' | sed -e 's/^"//' -e 's/"$//')
-    VULTR_SVR_ITEM_VALUE=$(echo "$VULTR_SVR_ITEM" | awk -F':' '{print $NF}' | sed -e 's/^"//' -e 's/"$//')
+# Store metadata in separate arrays
+SVR_COUNT=0
+for SVR_ITEM in "${SVR_INFO[@]}"; do
+  SVR_ITEM_KEY=$(echo "$SVR_ITEM" | cut -d: -f1 | sed -e 's/^"//' -e 's/"$//')
+  SVR_ITEM_VALUE=$(echo "$SVR_ITEM" | cut -d: -f2- | sed -e 's/^"//' -e 's/"$//')
+  if [[ "$SVR_ITEM_KEY" == "SUBID" ]]; then
+    : $((SVR_COUNT++))
+    SVR_IDS+=("$SVR_ITEM_VALUE")
+  fi
+  if [ ${#SVR_IDS[@]} -eq $SVR_COUNT ]; then
+    if [[ "$SVR_ITEM_KEY" == "date_created" ]]; then
+      SVR_CREATION_DATETIMES+=("$SVR_ITEM_VALUE")
+    fi
+    if [[ "$SVR_ITEM_KEY" == "internal_ip" ]]; then
+      SVR_PVT_IPV4S+=("$SVR_ITEM_VALUE")
+    fi
+    if [[ "$SVR_ITEM_KEY" == "label" ]]; then
+      SVR_LABELS+=("$SVR_ITEM_VALUE")
+    fi
+  fi
 done
 
-VULTR_SVR_CREATION_DATETIMES_LIST=$(wget -qO- --header="API-Key: ${VULTR_API_KEY}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -Po "\"date_created\":\"\K\d{4}(?:-\d{2}){2}\s+(?:\d{2}:){2}\d{2}")
-VULTR_SVR_CREATION_DATETIMES=($(echo $VULTR_SVR_CREATION_DATETIMES_LIST | sed -re 's/(-[0-9]{2})[[:space:]]{1,}([0-9]{2}:)/\1T\2/g'))
+# Find the most recent server
+if [ ${#SVR_CREATION_DATETIMES[@]} -eq $SVR_COUNT ]; then
+  IDX=0
+  MAX_IDX=0
+  MAX_SVR_CREATION_TIMESTAMP=$(date --date=${SVR_CREATION_DATETIMES[0]} +%s)
+  for SVR_CREATION_DATETIME in "${SVR_CREATION_DATETIMES[@]}"; do
+    SVR_CREATION_TIMESTAMP=$(date --date=${SVR_CREATION_DATETIME} +%s)
+    expr $SVR_CREATION_TIMESTAMP \> $MAX_SVR_CREATION_TIMESTAMP > /dev/null && { MAX_IDX=$IDX; MAX_SVR_CREATION_TIMESTAMP=$SVR_CREATION_TIMESTAMP; }
+    : $((IDX++))
+  done
+fi
 
-IDX=0
-MAX_IDX=0
-MAX_VULTR_SVR_CREATION_TIMESTAMP=$(date --date=${VULTR_SVR_CREATION_DATETIMES[0]} +%s)
-for VULTR_SVR_CREATION_DATETIME in ${VULTR_SVR_CREATION_DATETIMES[@]}; do
-  VULTR_SVR_CREATION_TIMESTAMP=$(date --date=${VULTR_SVR_CREATION_DATETIME} +%s)
-  expr $VULTR_SVR_CREATION_TIMESTAMP \> $MAX_VULTR_SVR_CREATION_TIMESTAMP > /dev/null && { MAX_IDX=$IDX; MAX_VULTR_SVR_CREATION_TIMESTAMP=$VULTR_SVR_CREATION_TIMESTAMP; }
-  : $((IDX++))
-done
-LAST_BUILT_VULTR_SVR_CREATION_DATETIME=${VULTR_SVR_CREATION_DATETIMES[$MAX_IDX]/T/ }
-
-VULTR_PVT_IPV4=$(wget -qO- --header="API-Key: ${VULTR_API_KEY}" --header="Label: ${VULTR_SVR_LBL}" ${VULTR_API_URL}/${VULTR_API_VER}/server/list | grep -Po "\"internal_ip\":\"\K(?:\d{1,3}\.){3}\d{1,3}")
+# Use the array index of the most recent server
+# to determine its label and private IP address
+# If something went wrong, use defaults
+if [ ! -z ${MAX_IDX+x} ] && [ ${#SVR_LABELS[@]} -eq $SVR_COUNT ]; then
+  LAST_BUILT_SVR_LABEL=${SVR_LABELS[$MAX_IDX]}
+else
+  LAST_BUILT_SVR_LABEL="rancher"
+fi
+if [ ! -z ${MAX_IDX+x} ] && [ ${#SVR_PVT_IPV4S[@]} -eq $SVR_COUNT ]; then
+  LAST_BUILT_SVR_PVT_IPV4=${SVR_PVT_IPV4S[$MAX_IDX]}
+else
+  LAST_BUILT_SVR_PVT_IPV4="192.168.99.99"
+fi
 
 cat > "cloud-config.yml" <<EOF
 #cloud-config
-hostname: ${VULTR_SRV_LABEL:-'rancher'}
+hostname: $LAST_BUILT_SRV_LABEL
 ssh_authorized_keys:
-  - ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAD6hltyl1MpRm6Q2KWr2QwaPGwa2RgGvyQh1u7Fgl+BsHJZiwmjhBMVdwH+CfJ3dD9m2cTnDXqdYJF5qfUl55DOsQHRYaqBywpv3bQ6LF+nJQNKSA0/BJJl2ONUWdQ7LmcUJmD6QtsKEY1JQEvRUtr6KfShokN7hYW0fn47HeolqlKQkA==
+  - ecdsa-sha2-nistp521 ...
 write_files:
   - path: /etc/ssh/sshd_config
     permissions: "0600"
@@ -59,7 +89,7 @@ rancher:
         dhcp: true
       eth1:
         dhcp: false
-        address: ${VULTR_PVT_IPV4}/16
+        address: ${LAST_BUILT_SVR_PVT_IPV4}/16
         mtu: 1450
   state:
     dev: LABEL=RANCHER_STATE
