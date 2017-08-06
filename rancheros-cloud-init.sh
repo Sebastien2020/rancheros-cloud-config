@@ -57,13 +57,13 @@ fi
 if [ ! -z ${MAX_IDX+x} ] && [ ${#SVR_PVT_IPV4S[@]} -eq $SVR_COUNT ]; then
   LAST_BUILT_SVR_PVT_IPV4=${SVR_PVT_IPV4S[$MAX_IDX]}
 else
-  LAST_BUILT_SVR_PVT_IPV4="192.168.99.99"
+  LAST_BUILT_SVR_PVT_IPV4="10.$((RANDOM%255)).$((RANDOM%255)).$((RANDOM%255))"
 fi
 
 # Generate cloud-config
 cat > "cloud-config.yml" <<EOF
 #cloud-config
-hostname: ${LAST_BUILT_SRV_LABEL}
+hostname: $LAST_BUILT_SVR_LABEL
 ssh_authorized_keys:
   - ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAD6hltyl1MpRm6Q2KWr2QwaPGwa2RgGvyQh1u7Fgl+BsHJZiwmjhBMVdwH+CfJ3dD9m2cTnDXqdYJF5qfUl55DOsQHRYaqBywpv3bQ6LF+nJQNKSA0/BJJl2ONUWdQ7LmcUJmD6QtsKEY1JQEvRUtr6KfShokN7hYW0fn47HeolqlKQkA==
 write_files:
@@ -90,7 +90,7 @@ rancher:
         dhcp: true
       eth1:
         dhcp: false
-        address: ${LAST_BUILT_SVR_PVT_IPV4}/16
+        address: ${LAST_BUILT_SVR_PVT_IPV4}/8
         mtu: 1450
   state:
     dev: LABEL=RANCHER_STATE
