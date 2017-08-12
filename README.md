@@ -1,5 +1,5 @@
 # RancherOS cloud-config
-rancheros-cloud-config.sh script to generate cloud-config.yml for RancherOS iPXE boot and install on Vultr hosts (https://www.vultr.com)
+rancheros-cloud-config.sh script to generate cloud-config.yml for RancherOS iPXE boot and install on Vultr hosts (https://www.vultr.com). Docker version set to v1.12.6 to be able to run Kubernetes.
 
 # Use in conjunction with iPXE boot script
 ```
