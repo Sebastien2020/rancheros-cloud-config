@@ -99,6 +99,8 @@ rancher:
       - /dev/vda
   services_include:
     centos-console: true
+  docker:
+    engine: docker-1.12.6
 EOF
 
 # Install rancheros to disk using cloud configi, then reboot
